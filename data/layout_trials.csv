@@ -1,0 +1,19 @@
+trial_id,layout,blade_design,height_in,time_s,s_per_rev,revs,flagged,flag_note
+L2-B1-T1,layout_2,1,1.5,36.45,0.85,42.88235294,True,"Team note: 'Possible Error, consistency in muck'"
+L2-B1-T2,layout_2,1,1.5,17.3,0.81,21.35802469,False,
+L2-B1-T3,layout_2,1,1.5,17.38,0.8,21.725,False,
+L2-B1-T4,layout_2,1,1.5,19.84,0.81,24.49382716,False,
+CO-B1-T1,control_offset,1,1.5,11.03,0.84,13.13095238,False,"Team note: build-up in open regions notably smaller than layout 2"
+CO-B1-T2,control_offset,1,1.5,8.82,0.88,10.02272727,False,
+CO-B1-T3,control_offset,1,1.5,7.42,0.83,8.939759036,False,
+CO-B1-T4,control_offset,1,1.5,9.36,0.68,13.76470588,True,"Original s/rev logged as 0.66 vs 0.82 for the rest of this group -- inconsistent baseline, worth re-checking raw video/calibration"
+NF-B1-T1,no_outside_flange,1,1.0,12.39,0.69,17.95652174,True,"Only reached 1.0in of the 1.5in target -- 'very unstable, stopped rotating when it hit a thicker consistency'"
+NF-B1-T2,no_outside_flange,1,1.0,7.8,0.69,11.30434783,True,"Only reached ~1.0in of the 1.5in target before stalling -- not directly comparable to the 1.5in trials"
+CO-B2-T1,control_offset,2,1.5,5.26,0.67,7.850746269,False,
+CO-B2-T2,control_offset,2,1.5,8.04,0.69,11.65217391,False,
+CO-B2-T3,control_offset,2,1.5,6.98,0.68,10.26470588,False,
+CO-B2-T4,control_offset,2,1.5,6.15,0.66,9.318181818,False,
+CO-B3-T1,control_offset,3,1.5,7.46,0.66,11.3030303,False,
+CO-B3-T2,control_offset,3,1.5,8.2,0.68,12.05882353,False,"Team note: noticeable build-up stuck in holes & gaps"
+CO-B3-T3,control_offset,3,1.5,4.37,0.69,6.333333333,False,
+CO-B3-T4,control_offset,3,1.5,4.71,0.67,7.029850746,False,

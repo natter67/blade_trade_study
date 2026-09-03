@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+sample_output.txt
+.DS_Store
