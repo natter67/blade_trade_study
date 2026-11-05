@@ -31,6 +31,7 @@ Two things this script does deliberately, on purpose:
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -132,6 +133,55 @@ def compare(df: pd.DataFrame, label: str, group_a, group_b, exclude_flagged=True
               "suggestive, not conclusive, and say so if asked about it.")
 
 
+def layout_robustness(df: pd.DataFrame):
+    """How much does the layout result depend on which trials are excluded,
+    and on the t-test's normality assumption?
+
+    - Re-runs the layout_2 vs control_offset (blade 1) comparison under all
+      four include/exclude choices for the two flagged trials.
+    - Reports a 95% CI on the mean difference (Welch).
+    - Reports an exact permutation test and an exact Mann-Whitney U test.
+      With n=3 vs 3 there are only C(6,3)=20 ways to split the data, so the
+      smallest two-sided p-value either exact test can return is 2/20 = 0.10.
+      The p ~ 0.002 figure therefore comes from the t-test's normality
+      assumption, not from the data alone.
+    """
+    a_all = df[(df["layout"] == "layout_2") & (df["blade_design"] == 1)]
+    b_all = df[(df["layout"] == "control_offset") & (df["blade_design"] == 1)]
+
+    print("\n=== Layout effect: sensitivity to flagged-trial exclusion ===")
+    print(f"  {'layout_2 trials':22s} {'control_offset trials':24s} {'n':7s} "
+          f"{'change':>8s} {'Welch p':>9s} {'exact MWU p':>12s}")
+    for excl_a in (False, True):
+        for excl_b in (False, True):
+            a = a_all[~a_all["flagged"]] if excl_a else a_all
+            b = b_all[~b_all["flagged"]] if excl_b else b_all
+            av, bv = a["revs"].values, b["revs"].values
+            p_welch = stats.ttest_ind(av, bv, equal_var=False).pvalue
+            p_mwu = stats.mannwhitneyu(av, bv, method="exact").pvalue
+            pct = (bv.mean() - av.mean()) / av.mean() * 100
+            la = "excl. L2-B1-T1" if excl_a else "all 4"
+            lb = "excl. CO-B1-T4" if excl_b else "all 4"
+            print(f"  {la:22s} {lb:24s} {len(av)} v {len(bv):<3d} "
+                  f"{pct:+7.1f}% {p_welch:9.4f} {p_mwu:12.4f}")
+
+    av = a_all[~a_all["flagged"]]["revs"].values
+    bv = b_all[~b_all["flagged"]]["revs"].values
+    res = stats.ttest_ind(av, bv, equal_var=False)
+    ci = res.confidence_interval(0.95)
+    perm = stats.permutation_test(
+        (av, bv), lambda x, y: x.mean() - y.mean(),
+        permutation_type="independent", n_resamples=np.inf,
+    )
+    print("\n  Headline comparison (both flagged trials excluded, n=3 vs 3):")
+    print(f"    Mean difference (layout_2 - control_offset): {av.mean() - bv.mean():.2f} revs, "
+          f"95% CI [{ci.low:.2f}, {ci.high:.2f}] (Welch, df={res.df:.1f})")
+    print(f"    Exact permutation test on the mean difference: p={perm.pvalue:.4f}")
+    print("    NOTE: with 3 vs 3 the smallest possible two-sided exact p is 0.10. "
+          "The direction is consistent across every exclusion choice above, but "
+          "the p ~ 0.002 depends on assuming normally distributed trials.")
+
+
 def main():
     df = load_trials()
     print_group_summaries(df)
@@ -142,6 +192,8 @@ def main():
         group_a=("layout_2", 1),
         group_b=("control_offset", 1),
     )
+
+    layout_robustness(df)
 
     compare_groups(
         df,
